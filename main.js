@@ -3,11 +3,8 @@ const {app, BrowserWindow, Menu, ipcMain, shell, screen} = require('electron');
 const isDev = process.env.NODE_ENV !== 'production';
 
 function createMainWindow () {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
     title: 'NEU Browser',
-    width: width,
-    height: height,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: true,
