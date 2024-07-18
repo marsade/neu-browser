@@ -11,7 +11,7 @@
     <title>NEU Browser</title>
 </head>
 <body>
-    <div class="tab-row">
+    <div class="header tab-row">
         <button class="tab-opt">
             <img src="imgs/icons/grid_2_fill.svg">
         </button>
@@ -31,21 +31,27 @@
     <div class="search-row">
         <div class="nav-icons">
             <button class="nav-prev">
-                <img src="imgs/icons/arrow_left_line.svg" width="22">
+                <img src="imgs/icons/arrow_left_line.svg" width="19">
             </button>
             <button class="nav-next">
-                <img src="imgs/icons/arrow_right_line.svg" width="22">
+                <img src="imgs/icons/arrow_right_line.svg" width="19">
             </button>
             <button class="nav-rel">
-                <img src="imgs/icons/refresh_1_line.svg" width="22">
+                <img src="imgs/icons/refresh_1_line.svg" width="19">
             </button>
         </div>
-        <input type="text" name="search-box" id="">
+        <div class="input-container">
+            <img src="imgs/icons/search_3_line.svg" class="search-icon">
+            <input type="text" name="search-box" id="" placeholder="Search with Google or type a URL">
+        </div>
     </div>
-    <div>
-        <div class="page-search">
-            <p>Some shit you expect</p>
-            <input type="text" name="" id="">
+    <div class="page-main">
+        <div class="logo-container">
+            <div class="logo-img"></div>
+            <div class="logo-text"></div>
+        </div>
+        <div class="search-main">
+            <input type="text" class="search-box" placeholder="Search">
         </div>
         <div class="popular">
             <p>Popular</p>
