@@ -9,6 +9,8 @@
   "author": "Mars",
   "license": "ISC",
   "dependencies": {
+    "browserify": "^17.0.0",
+    "chrome-tabs": "^5.4.0",
     "electron": "^31.2.1"
   }
 }
