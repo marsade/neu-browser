@@ -25,12 +25,19 @@ body {
 .tab-row .tab-opt:hover {
   background-color: rgba(67, 80, 88, 0.44);
 }
+.tab-row .tabs-container {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
 .tab-row .tab {
   display: flex;
   padding: 7px 10px;
   border-radius: 10px;
   width: 180px;
   justify-content: space-between;
+  cursor: default;
+  user-select: none;
 }
 .tab-row .tab-left {
   display: flex;
