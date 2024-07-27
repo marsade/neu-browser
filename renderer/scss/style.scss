@@ -27,12 +27,19 @@ body {
 
 		}
 	}
+	.tabs-container {
+		display: flex;
+		flex-direction: row;
+		gap: 15px;
+	}
 	.tab {
 		display: flex;
 		padding: 7px 10px;
 		border-radius: 10px;
 		width: 180px;
 		justify-content: space-between;
+		cursor: default;
+		user-select: none;
 	}
 	.tab-left {
 		display: flex;
@@ -58,7 +65,8 @@ body {
 	}
 	.active {
 		background-color:  #fff;
-		box-shadow: 4px 5px 8px 0px rgba(0,0,0,0.10);	
+		box-shadow: 4px 5px 8px 0px rgba(0,0,0,0.10);
+
 	}
 	.add-tab {
 		margin-left: 10px;
@@ -80,7 +88,6 @@ body {
 }
 @keyframes expand {
 	0% {width: 600px;}
-	// 50% {width: 800px;}
 	100% {width:900px;}
 }
 .search-row {
