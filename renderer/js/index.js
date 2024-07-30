@@ -32,12 +32,13 @@ function removeTab(tabId) {
         currentTabId = null;
       }
     }
-    if (tabs.length === 0) {
-      window.NEBrowserAPI.quit_app();
-    }
     // Update the DOM
     updateDOM();
     console.log('Tabs:', tabs);
+
+    if (tabs.length === 0) {
+      window.electronAPI.quitApp();
+    }
   }
 }
 
@@ -82,12 +83,17 @@ function updateDOM() {
   // Highlight the current tab
   if (currentTabId) {
     const currentTabDiv = document.querySelector(`[data-tab-id="${currentTabId}"]`);
+    console.log(currentTabDiv);
     if (currentTabDiv) {
-      currentTabDiv.classList.add('current-tab');
+      currentTabDiv.classList.add('active');
     }
   }
 }
 
+//Load a tab on intitial window load
 window.onload = () => {
-  document.getElementById('add-tab').addEventListener('click', addTab);
-}
+  addTab();
+};
+
+//Add tab when a add tab button is clicked
+document.getElementById('add-tab').addEventListener('click', addTab);
