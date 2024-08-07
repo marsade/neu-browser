@@ -46,10 +46,12 @@ body {
   justify-content: space-between;
   cursor: default;
   user-select: none;
+  white-space: nowrap;
 }
 .tab-row .tab-left {
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 .tab-row .tab-icon {
   width: 12px;
