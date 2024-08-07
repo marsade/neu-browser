@@ -2,6 +2,8 @@ let tabCount = 0;
 let tabs = [];
 let currentTabId = null;
 
+
+// Insert a new tab
 function addTab() {
   tabCount++;
   const tabId = `tab-${tabCount}`;
@@ -25,13 +27,19 @@ function switchToTab(tabId) {
   updateDOM();
 }
 
-function removeTab(tabId) {
+// Retrieve the tab to close
+function closeTab(event) {
+  event.stopPropagation();
+  const button = event.target;
+  const tabDiv = button.closest('.tab');
+  const tabId = tabDiv.getAttribute('data-tab-id');
+  removeTab(tabId);
+}
 
+//Remove tab from the DOM
+function removeTab(tabId) {
   // Send signal to close app if tabs array is empty
-  if (tabs.length === 0) {
-    window.electronAPI.quitApp();
-  }
-  // Find the tab index
+// Find the tab index
   const index = tabs.findIndex(tab => tab.id === tabId);
   if (index !== -1) {
     tabs.splice(index, 1);
@@ -42,21 +50,26 @@ function removeTab(tabId) {
         currentTabId = tabs[index] ? tabs[index].id : tabs[index - 1].id;
       }
     }
+  if (tabs.length === 0) {
+    window.electronAPI.quitApp();
+  }
     // Update the DOM
     updateDOM();
 
   }
 }
 
-
-function closeTab(event) {
-  event.stopPropagation();
-  const button = event.target;
-  const tabDiv = button.closest('.tab');
-  const tabId = tabDiv.getAttribute('data-tab-id');
-  removeTab(tabId);
+function adjustTabWidths() {
+  const tabContainer = document.querySelector('.tabs-container');
+  const tabElements = tabContainer.querySelectorAll('.tab');
+  const containerWidth = tabContainer.clientWidth;
+  if (tabs.length > 5) {
+    const tabWidth = Math.max(containerWidth / tabs.length, 160); // Minimum width of 100px per tab
+    tabElements.forEach(tab => {
+      tab.style.width = `${tabWidth}px`;
+    });
+  }
 }
-
 
 function updateDOM() {
   const tabContainer = document.querySelector('.tabs-container');
@@ -70,20 +83,22 @@ function updateDOM() {
     <div class="tab-left">
       <div class="tab-icon"></div>
         <p>New Tab</p>
-      </div>
-      <button class="close-tab">
-          <img src="imgs/icons/close_line.svg" width="15">
-      </button>
+    </div>
+    <button class="close-tab">
+      <img src="imgs/icons/close_line.svg" width="15">
+    </button>
     `;
     tabContainer.appendChild(tabDiv);
 
-    // Attach event listeners to the close buttons
+    tabDiv.addEventListener('mousedown', () => switchToTab(tab.id));
     tabDiv.querySelector('.close-tab').addEventListener('click', closeTab);
-    // Attach event listeners to the tabs to listen for when they're clicked
-    tabDiv.addEventListener('click', () => switchToTab(tab.id));
-    // adjustTabWidths();
+
+    tabDiv.querySelector('.close-tab').addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+    adjustTabWidths();
   });
-  
+
   // Highlight the current tab
   if (currentTabId) {
     const currentTabDiv = document.querySelector(`[data-tab-id="${currentTabId}"]`);
@@ -93,21 +108,22 @@ function updateDOM() {
   }
 }
 
-// function adjustTabWidths() {
-//   const tabContainer = document.querySelector('.tabs-container');
-//   const tabElements = tabContainer.querySelectorAll('.tab');
-//   const containerWidth = tabContainer.clientWidth;
-//   const tabWidth = Math.max(containerWidth / tabs.length, 100); // Minimum width of 100px per tab
-//   tabElements.forEach(tab => {
-//     tab.style.width = `${tabWidth}px`;
-//   });
-// }
 
 
 //Load a tab on intitial window load
 window.onload = () => {
   addTab();
-};
-
-//Add tab when a add tab button is clicked
-document.getElementById('add-tab').addEventListener('click', addTab);
+  document.getElementById('add-tab').addEventListener('click', addTab);
+}
+//   const draggable = window.draggable.create('.tabs-container', {
+//     draggable: '.tab',
+//     delay: 0,
+//     distance: 5,
+//     mirror: {
+//       constrainDimensions: true,
+//       xAxis: true,
+//       yAxis: false,
+//     }
+//   });
+//   console.log(draggable);
+// });
