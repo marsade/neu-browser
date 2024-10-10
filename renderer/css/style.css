@@ -147,17 +147,6 @@ body {
   animation-duration: 1s;
 }
 
-.page-main {
-  background-color: #f5f5f5;
-  display: flex;
-  gap: 50px;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  height: 100vh;
-  padding: 100px 40px 0;
-}
-
 .logo-container {
   display: flex;
   align-items: center;
@@ -205,4 +194,22 @@ body {
   width: 80px;
   height: 80px;
   background-color: #000;
+}
+
+.webview-container {
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+webview {
+  width: 100%;
+  height: 100%;
+  border: none;
+  visibility: collapse;
+}
+webview.active {
+  visibility: visible;
 }/*# sourceMappingURL=style.css.map */

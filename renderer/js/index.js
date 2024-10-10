@@ -1,21 +1,32 @@
 let tabCount = 0;
 let tabs = [];
 let currentTabId = null;
+let currentWebView = null;
 
+// Create the webview for each tab
+function createWebView(tabId, url='https://www.google.com') {
+  const webView = document.createElement('webview');
+  webView.setAttribute('src', url);
+  webView.setAttribute('data-tab-id', tabId);
+  webView.classList.add('webview');
+  webView.style.width = '100%';
+  webView.style.height = '100%';
+  return webView;
+}
 
 // Insert a new tab
 function addTab() {
+  if (currentWebView) {
+    currentWebView.remove();
+  }
   tabCount++;
   const tabId = `tab-${tabCount}`;
   const tabContent = `Tab ${tabCount}`;
-  
-  // Add the new tab to the array
   tabs.push({ id: tabId, content: tabContent });
-  
-  // Set the newly added tab as the current tab
   currentTabId = tabId;
-  
-  // Update the DOM
+  const webView = createWebView(tabId);
+  document.querySelector('.webview-container').appendChild(webView);
+  currentWebView = webView;
   updateDOM();
 }
 
@@ -23,6 +34,7 @@ function addTab() {
 function switchToTab(tabId) {
   if (tabId) {
     currentTabId = tabId;
+    currentWebView = document.querySelector(`webview[data-tab-id="${tabId}"]`);
   }
   updateDOM();
 }
@@ -38,8 +50,7 @@ function closeTab(event) {
 
 //Remove tab from the DOM
 function removeTab(tabId) {
-  // Send signal to close app if tabs array is empty
-// Find the tab index
+  // Find the tab index
   const index = tabs.findIndex(tab => tab.id === tabId);
   if (index !== -1) {
     tabs.splice(index, 1);
@@ -53,9 +64,15 @@ function removeTab(tabId) {
   if (tabs.length === 0) {
     window.electronAPI.quitApp();
   }
-    // Update the DOM
-    updateDOM();
+  removeWebView(tabId);
+  updateDOM();
+  }
+}
 
+function removeWebView(tabId) {
+  const webView = document.querySelector(`webview[data-tab-id="${tabId}"]`);
+  if (webView) {
+    webView.remove();
   }
 }
 
@@ -74,7 +91,6 @@ function adjustTabWidths() {
 function updateDOM() {
   const tabContainer = document.querySelector('.tabs-container');
   tabContainer.innerHTML = '';
-
   tabs.forEach(tab => {
     const tabDiv = document.createElement('div');
     tabDiv.className = 'tab';
@@ -89,10 +105,8 @@ function updateDOM() {
     </button>
     `;
     tabContainer.appendChild(tabDiv);
-
     tabDiv.addEventListener('mousedown', () => switchToTab(tab.id));
     tabDiv.querySelector('.close-tab').addEventListener('click', closeTab);
-
     tabDiv.querySelector('.close-tab').addEventListener('mousedown', (e) => {
       e.stopPropagation();
     });
@@ -102,8 +116,10 @@ function updateDOM() {
   // Highlight the current tab
   if (currentTabId) {
     const currentTabDiv = document.querySelector(`[data-tab-id="${currentTabId}"]`);
-    if (currentTabDiv) {
+    const currentWebView = document.querySelector(`webview[data-tab-id="${currentTabId}"]`);
+    if (currentTabDiv && currentWebView) {
       currentTabDiv.classList.add('active');
+      currentWebView.classList.add('active');
     }
   }
 }
@@ -115,15 +131,3 @@ window.onload = () => {
   addTab();
   document.getElementById('add-tab').addEventListener('click', addTab);
 }
-//   const draggable = window.draggable.create('.tabs-container', {
-//     draggable: '.tab',
-//     delay: 0,
-//     distance: 5,
-//     mirror: {
-//       constrainDimensions: true,
-//       xAxis: true,
-//       yAxis: false,
-//     }
-//   });
-//   console.log(draggable);
-// });
