@@ -36,17 +36,20 @@ body {
 .tab-row .tabs-container {
   display: flex;
   flex-direction: row;
-  gap: 15px;
+  gap: 2px;
 }
 .tab-row .tab {
   display: flex;
   padding: 7px 10px;
-  border-radius: 10px;
+  border-radius: 7px;
   width: 180px;
   justify-content: space-between;
   cursor: default;
   user-select: none;
   white-space: nowrap;
+}
+.tab-row .tab:hover {
+  background-color: rgba(48, 54, 57, 0.15);
 }
 .tab-row .tab-left {
   display: flex;
@@ -72,6 +75,9 @@ body {
 .tab-row .active {
   background-color: #fff;
   box-shadow: 4px 5px 8px 0px rgba(0, 0, 0, 0.1);
+}
+.tab-row .active:hover {
+  background-color: #fff;
 }
 .tab-row .add-tab {
   margin-left: 10px;
@@ -206,10 +212,6 @@ body {
 
 webview {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   border: none;
-  visibility: collapse;
-}
-webview.active {
-  visibility: visible;
 }/*# sourceMappingURL=style.css.map */
