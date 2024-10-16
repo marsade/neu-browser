@@ -3,16 +3,6 @@ let tabs = [];
 let currentTabId = null;
 let currentWebView = null;
 
-// Create the webview for each tab
-function createWebView(tabId, url='https://www.google.com') {
-  const webView = document.createElement('webview');
-  webView.setAttribute('src', url);
-  webView.setAttribute('data-tab-id', tabId);
-  webView.classList.add('webview');
-  webView.style.width = '100%';
-  webView.style.height = '100%';
-  return webView;
-}
 
 // Insert a new tab
 function addTab() {
@@ -21,12 +11,12 @@ function addTab() {
   }
   tabCount++;
   const tabId = `tab-${tabCount}`;
-  const tabContent = `Tab ${tabCount}`;
-  tabs.push({ id: tabId, content: tabContent });
-  currentTabId = tabId;
   const webView = createWebView(tabId);
-  document.querySelector('.webview-container').appendChild(webView);
+  const tabContent = webView;
   currentWebView = webView;
+  currentTabId = tabId;
+  tabs.push({ id: tabId, content: tabContent });
+  console.log(tabs);
   updateDOM();
 }
 
@@ -46,6 +36,7 @@ function closeTab(event) {
   const tabDiv = button.closest('.tab');
   const tabId = tabDiv.getAttribute('data-tab-id');
   removeTab(tabId);
+  removeWebView(tabId);
 }
 
 //Remove tab from the DOM
@@ -64,11 +55,20 @@ function removeTab(tabId) {
   if (tabs.length === 0) {
     window.electronAPI.quitApp();
   }
-  removeWebView(tabId);
   updateDOM();
   }
 }
 
+// Create the webview for each tab
+function createWebView(tabId, url='https://www.google.com') {
+  const webView = document.createElement('webview');
+  webView.setAttribute('src', url);
+  webView.setAttribute('data-tab-id', tabId);
+  webView.classList.add('webview');
+  return webView;
+}
+
+// Remove the webview for the given tab
 function removeWebView(tabId) {
   const webView = document.querySelector(`webview[data-tab-id="${tabId}"]`);
   if (webView) {
@@ -76,6 +76,10 @@ function removeWebView(tabId) {
   }
 }
 
+function collectSearch(){
+
+}
+// Adjust the tab widths based on the number of tabs
 function adjustTabWidths() {
   const tabContainer = document.querySelector('.tabs-container');
   const tabElements = tabContainer.querySelectorAll('.tab');
@@ -88,8 +92,10 @@ function adjustTabWidths() {
   }
 }
 
+// Update the DOM if changes
 function updateDOM() {
   const tabContainer = document.querySelector('.tabs-container');
+  const webviewContainer = document.querySelector('.webview-container');
   tabContainer.innerHTML = '';
   tabs.forEach(tab => {
     const tabDiv = document.createElement('div');
@@ -104,6 +110,8 @@ function updateDOM() {
       <img src="imgs/icons/close_line.svg" width="15">
     </button>
     `;
+    webview = tab.content;
+    webviewContainer.appendChild(webview);    
     tabContainer.appendChild(tabDiv);
     tabDiv.addEventListener('mousedown', () => switchToTab(tab.id));
     tabDiv.querySelector('.close-tab').addEventListener('click', closeTab);
@@ -111,6 +119,16 @@ function updateDOM() {
       e.stopPropagation();
     });
     adjustTabWidths();
+
+    if (tab.id === currentTabId) {
+      webview.style.visibility = 'visible';
+      webview.style.position = 'relative';
+      webview.style.zIndex = 1; 
+    } else {
+      webview.style.visibility = 'hidden';
+      webview.style.position = 'absolute';
+      webview.style.zIndex = -1;
+    }
   });
 
   // Highlight the current tab
@@ -119,12 +137,9 @@ function updateDOM() {
     const currentWebView = document.querySelector(`webview[data-tab-id="${currentTabId}"]`);
     if (currentTabDiv && currentWebView) {
       currentTabDiv.classList.add('active');
-      currentWebView.classList.add('active');
     }
   }
 }
-
-
 
 //Load a tab on intitial window load
 window.onload = () => {
