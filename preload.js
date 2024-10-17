@@ -3,7 +3,8 @@ const { Draggable } = require('@shopify/draggable');
 
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  quitApp: () => ipcRenderer.send('quit-app')
+  quitApp: () => ipcRenderer.send('quit-app'),
+  toggleLock: (state) => ipcRenderer.send('toggle-lock', state)
 });
 
 contextBridge.exposeInMainWorld('draggable', {

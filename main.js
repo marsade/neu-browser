@@ -1,11 +1,14 @@
 const {app, BrowserWindow, Menu, ipcMain, shell, screen} = require('electron');
 const path = require('path');
-
 const isDev = process.env.NODE_ENV !== 'production';
-
+let isLocked = false;
 function createMainWindow () {
   mainWindow = new BrowserWindow({
     title: 'NEU Browser',
+    minimizable: false,
+    maximizable: true,
+    moveable: true,
+    frame: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -17,12 +20,37 @@ function createMainWindow () {
   if (isDev) {
     mainWindow.webContents.openDevTools();
 }
-
+  mainWindow.on('close', (event) => {
+    if (isLocked) {
+      event.preventDefault();
+      mainWindow.setMovable(false);
+    }
+  })
   mainWindow.loadFile('renderer/index.html');
-
   mainWindow.maximize();
   mainWindow.on('closed', () => (mainWindow = null));
+
 }
+ipcMain.on('quit-app', () => {
+  app.quit();
+});
+ipcMain.on('toggle-lock', (event) => {
+  console.log('Received toggle-lock event');
+  console.log('Current isLocked state:', isLocked);
+
+  isLocked = !isLocked;
+  
+  try {
+    mainWindow.setResizable(!isLocked);
+    mainWindow.setMovable(!isLocked);
+    mainWindow.setMinimizable(!isLocked);
+    console.log('Window properties successfully updated');
+  } catch (error) {
+    console.error('Failed to update window properties:', error);
+  }
+
+  console.log(`Window is now ${isLocked ? 'locked' : 'unlocked'}`);
+});
 
 app.whenReady().then(() => {
   createMainWindow()
@@ -41,8 +69,4 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
-});
-
-ipcMain.on('quit-app', () => {
-  app.quit();
 });
