@@ -14,7 +14,7 @@
 <body>
     <div class="header tab-row">
         <button class="tab-opt">
-            <img src="imgs/icons/grid_2_fill.svg">
+            <span class="lock unlocked"></span>
         </button>
         <div class="tabs-container"></div>
         <button class="add-tab" id='add-tab'>
@@ -35,8 +35,10 @@
         </div>
         <div class="input-container">
             <img src="imgs/icons/search_3_line.svg" class="search-icon">
-            <input type="text" name="search-box" id="" placeholder="Search with Google or type a URL">
-            <input type="submit" hidden />
+            <form action="" id="search">
+                <input type="text" name="search-box" id="" placeholder="Search with Google or type a URL">
+                <input type="submit" hidden />
+            </form>
         </div>
     </div>
     <div class="webview-container"></div>
