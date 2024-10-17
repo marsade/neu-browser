@@ -76,9 +76,6 @@ function removeWebView(tabId) {
   }
 }
 
-function collectSearch(){
-
-}
 // Adjust the tab widths based on the number of tabs
 function adjustTabWidths() {
   const tabContainer = document.querySelector('.tabs-container');
@@ -144,5 +141,22 @@ function updateDOM() {
 //Load a tab on intitial window load
 window.onload = () => {
   addTab();
+  const lockButton = document.querySelector('.lock');
+  const searchInput = document.getElementById('search');
   document.getElementById('add-tab').addEventListener('click', addTab);
+  lockButton.addEventListener('click', () => {
+    lockButton.classList.toggle('unlocked');
+    if (lockButton.classList.contains('unlocked')) {
+      window.electronAPI.toggleLock(false);
+    } else {
+      window.electronAPI.toggleLock(true);
+    }
+  });
+  searchInput.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(searchInput);
+    searchURL = 'https://www.' + data.get('search-box');
+    console.log(searchURL);
+    //createWebView(currentTabId, searchURL);
+  });
 }
