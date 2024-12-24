@@ -11,11 +11,11 @@ function addTab() {
   }
   tabCount++;
   const tabId = `tab-${tabCount}`;
-  const webView = createWebView(tabId);
-  const tabContent = webView;
-  currentWebView = webView;
+  // const tabContent = createWebView(tabId);
+  const history = [];
+  // currentWebView = tabContent;
   currentTabId = tabId;
-  tabs.push({ id: tabId, content: tabContent });
+  tabs.push({ id: tabId, history: history });
   console.log(tabs);
   updateDOM();
 }
@@ -115,17 +115,17 @@ function updateDOM() {
     tabDiv.querySelector('.close-tab').addEventListener('mousedown', (e) => {
       e.stopPropagation();
     });
-    adjustTabWidths();
+  //   adjustTabWidths();
 
-    if (tab.id === currentTabId) {
-      webview.style.visibility = 'visible';
-      webview.style.position = 'relative';
-      webview.style.zIndex = 1; 
-    } else {
-      webview.style.visibility = 'hidden';
-      webview.style.position = 'absolute';
-      webview.style.zIndex = -1;
-    }
+  //   if (tab.id === currentTabId) {
+  //     webview.style.visibility = 'visible';
+  //     webview.style.position = 'relative';
+  //     webview.style.zIndex = 1; 
+  //   } else {
+  //     webview.style.visibility = 'hidden';
+  //     webview.style.position = 'absolute';
+  //     webview.style.zIndex = -1;
+  //   }
   });
 
   // Highlight the current tab
@@ -142,7 +142,7 @@ function updateDOM() {
 window.onload = () => {
   addTab();
   const lockButton = document.querySelector('.lock');
-  const searchInput = document.getElementById('search');
+  const searchInput = document.getElementById('search-input');
   document.getElementById('add-tab').addEventListener('click', addTab);
   lockButton.addEventListener('click', () => {
     lockButton.classList.toggle('unlocked');
@@ -152,11 +152,69 @@ window.onload = () => {
       window.electronAPI.toggleLock(true);
     }
   });
+  
   searchInput.addEventListener('submit', (event) => {
     event.preventDefault();
     const data = new FormData(searchInput);
     searchURL = 'https://www.' + data.get('search-box');
     console.log(searchURL);
-    //createWebView(currentTabId, searchURL);
+    createWebView(currentTabId, searchURL);
   });
+}
+
+let addressBar = document.getElementById('address-bar');
+let searchHome = document.getElementById('search-home');
+let suggestionBox = document.getElementById('suggestion-box');
+let fetchSuggestions = window.electronAPI.debounce(async (query) => {
+  if (!query.trim()) {
+    suggestionBox.innerHTML = "";
+    return;
+  }
+
+    try {
+    const response = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`);
+    const suggestions = await response.json();
+    displaySuggestions(suggestions[1]);
+  } catch (error) {
+    console.error("Error fetching suggestions:", error);
+  }
+}, 300);
+
+searchHome.addEventListener("input", (event) => {
+  addressBar.focus();
+  addressBar.click();
+  addressBar.value = event.target.value;
+  searchHome.value = '';
+})
+
+addressBar.addEventListener('input', (event) => {
+  const query = event.target.value;
+  fetchSuggestions(query);
+});
+addressBar.addEventListener("click", function () {
+  this.classList.add("clicked");
+});
+
+function displaySuggestions(suggestions) {
+  suggestionBox.innerHTML = "";
+  suggestions.forEach((suggestion) => {
+    const suggestionItem = document.createElement("div");
+    suggestionItem.className = "suggestion-item";
+    suggestionItem.textContent = suggestion;
+
+    suggestionItem.addEventListener("click", () => {
+      addressBar.value = suggestion;
+      suggestionBox.innerHTML = "";
+      sendQuery(suggestion);
+    });
+
+    suggestionBox.appendChild(suggestionItem);
+  });
+}
+
+function sendQuery(userInput) {
+  let searchQuery = encodeURIComponent(userInput);
+  const searchURL = `https://www.google.com/search?q=${searchQuery}`;
+  console.log(searchURL);
+  createWebView(currentTabId, searchURL);
 }
