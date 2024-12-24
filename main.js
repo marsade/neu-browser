@@ -14,6 +14,7 @@ function createMainWindow () {
       contextIsolation: true,
       nodeIntegration: true,
       webviewTag: true,
+      enableRemoteModule: true,
     }
   });
 
@@ -51,6 +52,15 @@ ipcMain.on('toggle-lock', (event) => {
 
   console.log(`Window is now ${isLocked ? 'locked' : 'unlocked'}`);
 });
+ipcMain.on('require-module', async (event, moduleName) => {
+  try {
+    const res = await require(moduleName);
+    return res;
+  } catch (error) {
+    console.error(`Failed to require module: ${moduleName}`, error);
+    return { error: error.message };
+  }
+})
 
 app.whenReady().then(() => {
   createMainWindow()
