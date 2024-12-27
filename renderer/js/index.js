@@ -1,27 +1,28 @@
+const tabs = [];
+const addressBar = document.getElementById('address-bar');
+const searchHome = document.getElementById('search-home');
+const suggestionBox = document.getElementById('suggestion-box');
 let tabCount = 0;
-let tabs = [];
-let currentTabId = null;
 let currentWebView = null;
-
+let currentTabId = null;
 
 // Insert a new tab
-function addTab() {
-  if (currentWebView) {
-    currentWebView.remove();
-  }
+function createTab () {
   tabCount++;
   const tabId = `tab-${tabCount}`;
-  // const tabContent = createWebView(tabId);
   const history = [];
-  // currentWebView = tabContent;
+  history.push(`file://${window.electronAPI.getHomePath()}`);
   currentTabId = tabId;
-  tabs.push({ id: tabId, history: history });
+  tabs.push({ id: tabId, history });
+  if (tabCount > 1) {
+    const webview = createWebView(tabId);
+  }
   console.log(tabs);
   updateDOM();
 }
 
 // Switch tabs
-function switchToTab(tabId) {
+function switchToTab (tabId) {
   if (tabId) {
     currentTabId = tabId;
     currentWebView = document.querySelector(`webview[data-tab-id="${tabId}"]`);
@@ -30,7 +31,7 @@ function switchToTab(tabId) {
 }
 
 // Retrieve the tab to close
-function closeTab(event) {
+function closeTab (event) {
   event.stopPropagation();
   const button = event.target;
   const tabDiv = button.closest('.tab');
@@ -39,32 +40,43 @@ function closeTab(event) {
   removeWebView(tabId);
 }
 
-//Remove tab from the DOM
-function removeTab(tabId) {
+// Remove tab from the DOM
+function removeTab (tabId) {
   // Find the tab index
   const index = tabs.findIndex(tab => tab.id === tabId);
   if (index !== -1) {
     tabs.splice(index, 1);
-    
+
     // If the current tab is removed, set the current tab to the next available tab
     if (currentTabId === tabId) {
       if (tabs.length > 0) {
         currentTabId = tabs[index] ? tabs[index].id : tabs[index - 1].id;
       }
     }
-  if (tabs.length === 0) {
-    window.electronAPI.quitApp();
-  }
-  updateDOM();
+    if (tabs.length === 0) {
+      window.electronAPI.quitApp();
+    }
+    updateDOM();
   }
 }
 
 // Create the webview for each tab
-function createWebView(tabId, url='https://www.google.com') {
+function createWebView(tabId, url = `file://${window.electronAPI.getHomePath()}`) {
   const webView = document.createElement('webview');
+  const homepage = document.querySelector('.home');
+  const webviewContainer = document.querySelector('.webview-container');
   webView.setAttribute('src', url);
   webView.setAttribute('data-tab-id', tabId);
   webView.classList.add('webview');
+  homepage.style.display = 'none';
+  webviewContainer.appendChild(webView);
+  currentWebView = webView;
+  currentWebView.addEventListener('did-finish-load', () => {
+    let tabsMap = new Map(tabs.map(tab => [tab.id, tab]));
+    const currentTab = tabsMap.get(currentTabId);
+    currentTab.history.push(currentWebView.src);
+    console.log(currentTab.history);
+  });
   return webView;
 }
 
@@ -77,7 +89,7 @@ function removeWebView(tabId) {
 }
 
 // Adjust the tab widths based on the number of tabs
-function adjustTabWidths() {
+function adjustTabWidths () {
   const tabContainer = document.querySelector('.tabs-container');
   const tabElements = tabContainer.querySelectorAll('.tab');
   const containerWidth = tabContainer.clientWidth;
@@ -90,9 +102,8 @@ function adjustTabWidths() {
 }
 
 // Update the DOM if changes
-function updateDOM() {
+function updateDOM () {
   const tabContainer = document.querySelector('.tabs-container');
-  const webviewContainer = document.querySelector('.webview-container');
   tabContainer.innerHTML = '';
   tabs.forEach(tab => {
     const tabDiv = document.createElement('div');
@@ -107,20 +118,19 @@ function updateDOM() {
       <img src="imgs/icons/close_line.svg" width="15">
     </button>
     `;
-    webview = tab.content;
-    webviewContainer.appendChild(webview);    
+    // webview = tab.content;
     tabContainer.appendChild(tabDiv);
     tabDiv.addEventListener('mousedown', () => switchToTab(tab.id));
     tabDiv.querySelector('.close-tab').addEventListener('click', closeTab);
     tabDiv.querySelector('.close-tab').addEventListener('mousedown', (e) => {
       e.stopPropagation();
     });
-  //   adjustTabWidths();
+    //   adjustTabWidths();
 
   //   if (tab.id === currentTabId) {
   //     webview.style.visibility = 'visible';
   //     webview.style.position = 'relative';
-  //     webview.style.zIndex = 1; 
+  //     webview.style.zIndex = 1;
   //   } else {
   //     webview.style.visibility = 'hidden';
   //     webview.style.position = 'absolute';
@@ -132,18 +142,80 @@ function updateDOM() {
   if (currentTabId) {
     const currentTabDiv = document.querySelector(`[data-tab-id="${currentTabId}"]`);
     const currentWebView = document.querySelector(`webview[data-tab-id="${currentTabId}"]`);
-    if (currentTabDiv && currentWebView) {
-      currentTabDiv.classList.add('active');
-    }
+    // currentTabDiv.classList.add('active');
   }
 }
 
-//Load a tab on intitial window load
+const fetchSuggestions = window.electronAPI.debounce(async (query) => {
+  if (!query.trim()) {
+    suggestionBox.innerHTML = '';
+    return;
+  }
+
+  try {
+    const response = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`);
+    const suggestions = await response.json();
+    displaySuggestions(suggestions[1]);
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+  }
+}, 300);
+
+searchHome.addEventListener('input', (event) => {
+  addressBar.focus();
+  addressBar.click();
+  addressBar.value = event.target.value;
+  searchHome.value = '';
+});
+
+addressBar.addEventListener('input', (event) => {
+  const query = event.target.value;
+  fetchSuggestions(query);
+});
+addressBar.addEventListener('click', function () {
+  this.classList.add('clicked');
+  this.select();
+});
+
+function displaySuggestions (suggestions) {
+  suggestionBox.innerHTML = '';
+  suggestions.forEach((suggestion) => {
+    const suggestionItem = document.createElement('div');
+    suggestionItem.className = 'suggestion-item';
+    suggestionItem.textContent = suggestion;
+
+    suggestionItem.addEventListener('click', () => {
+      addressBar.value = suggestion;
+      suggestionBox.innerHTML = '';
+      sendQuery(suggestion);
+    });
+
+    suggestionBox.appendChild(suggestionItem);
+  });
+}
+
+// Send the search query to the current webview or create a new tab if none is open
+function sendQuery (userInput) {
+  const searchQuery = encodeURIComponent(userInput);
+  const searchURL = `https://www.google.com/search?q=${searchQuery}`;
+  addressBar.value = searchURL;
+  if (currentWebView) {
+    currentWebView.setAttribute('src', searchURL);
+  } else {
+    createWebView(currentTabId, searchURL);
+  }
+}
+
+// Load a tab on intitial window load
 window.onload = () => {
-  addTab();
+  createTab();
   const lockButton = document.querySelector('.lock');
   const searchInput = document.getElementById('search-input');
-  document.getElementById('add-tab').addEventListener('click', addTab);
+
+  const backButton = document.querySelector('.nav-prev');
+  const forwardButton = document.querySelector('.nav-next');
+  const reloadButton = document.querySelector('.nav-rel');
+  document.getElementById('add-tab').addEventListener('click', createTab);
   lockButton.addEventListener('click', () => {
     lockButton.classList.toggle('unlocked');
     if (lockButton.classList.contains('unlocked')) {
@@ -152,69 +224,17 @@ window.onload = () => {
       window.electronAPI.toggleLock(true);
     }
   });
-  
+
   searchInput.addEventListener('submit', (event) => {
     event.preventDefault();
     const data = new FormData(searchInput);
-    searchURL = 'https://www.' + data.get('search-box');
-    console.log(searchURL);
-    createWebView(currentTabId, searchURL);
+    searchURL = data.get('search-box');
+    addressBar.blur();
+    suggestionBox.innerHTML = '';
+    sendQuery(searchURL);
   });
-}
 
-let addressBar = document.getElementById('address-bar');
-let searchHome = document.getElementById('search-home');
-let suggestionBox = document.getElementById('suggestion-box');
-let fetchSuggestions = window.electronAPI.debounce(async (query) => {
-  if (!query.trim()) {
-    suggestionBox.innerHTML = "";
-    return;
-  }
-
-    try {
-    const response = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`);
-    const suggestions = await response.json();
-    displaySuggestions(suggestions[1]);
-  } catch (error) {
-    console.error("Error fetching suggestions:", error);
-  }
-}, 300);
-
-searchHome.addEventListener("input", (event) => {
-  addressBar.focus();
-  addressBar.click();
-  addressBar.value = event.target.value;
-  searchHome.value = '';
-})
-
-addressBar.addEventListener('input', (event) => {
-  const query = event.target.value;
-  fetchSuggestions(query);
-});
-addressBar.addEventListener("click", function () {
-  this.classList.add("clicked");
-});
-
-function displaySuggestions(suggestions) {
-  suggestionBox.innerHTML = "";
-  suggestions.forEach((suggestion) => {
-    const suggestionItem = document.createElement("div");
-    suggestionItem.className = "suggestion-item";
-    suggestionItem.textContent = suggestion;
-
-    suggestionItem.addEventListener("click", () => {
-      addressBar.value = suggestion;
-      suggestionBox.innerHTML = "";
-      sendQuery(suggestion);
-    });
-
-    suggestionBox.appendChild(suggestionItem);
+  backButton.addEventListener('click', () => {
+    console.log(currentWebView.canGoBack());
   });
-}
-
-function sendQuery(userInput) {
-  let searchQuery = encodeURIComponent(userInput);
-  const searchURL = `https://www.google.com/search?q=${searchQuery}`;
-  console.log(searchURL);
-  createWebView(currentTabId, searchURL);
-}
+};
