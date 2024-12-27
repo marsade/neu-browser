@@ -1,7 +1,8 @@
-const {app, BrowserWindow, Menu, ipcMain, shell, screen} = require('electron');
+const { app, BrowserWindow, Menu, ipcMain} = require('electron');
 const path = require('path');
 const isDev = process.env.NODE_ENV !== 'production';
 let isLocked = false;
+let mainWindow;
 function createMainWindow () {
   mainWindow = new BrowserWindow({
     title: 'NEU Browser',
@@ -14,23 +15,22 @@ function createMainWindow () {
       contextIsolation: true,
       nodeIntegration: true,
       webviewTag: true,
-      enableRemoteModule: true,
+      enableRemoteModule: true
     }
   });
 
   if (isDev) {
     mainWindow.webContents.openDevTools();
-}
+  }
   mainWindow.on('close', (event) => {
     if (isLocked) {
       event.preventDefault();
       mainWindow.setMovable(false);
     }
-  })
+  });
   mainWindow.loadFile('renderer/index.html');
   mainWindow.maximize();
   mainWindow.on('closed', () => (mainWindow = null));
-
 }
 ipcMain.on('quit-app', () => {
   app.quit();
@@ -40,7 +40,7 @@ ipcMain.on('toggle-lock', (event) => {
   console.log('Current isLocked state:', isLocked);
 
   isLocked = !isLocked;
-  
+
   try {
     mainWindow.setResizable(!isLocked);
     mainWindow.setMovable(!isLocked);
@@ -52,28 +52,15 @@ ipcMain.on('toggle-lock', (event) => {
 
   console.log(`Window is now ${isLocked ? 'locked' : 'unlocked'}`);
 });
-ipcMain.on('require-module', async (event, moduleName) => {
-  try {
-    const res = await require(moduleName);
-    return res;
-  } catch (error) {
-    console.error(`Failed to require module: ${moduleName}`, error);
-    return { error: error.message };
-  }
-})
 
 app.whenReady().then(() => {
-  createMainWindow()
+  createMainWindow();
   Menu.setApplicationMenu(null);
 
-  
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
-  })
-})
-
-
-
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+  });
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
