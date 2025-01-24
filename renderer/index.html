@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' "/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <script  src="./js/index.js" defer></script>
     <title>NEU Browser</title>
@@ -18,19 +18,19 @@
         </button>
         <div class="tabs-container"></div>
         <button class="add-tab" id='add-tab'>
-            <img src="imgs/icons/add_line.svg" >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512"><path fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="32" d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192Z"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160m80-80H176"/></svg>
         </button>
     </div>
     <div class="search-row">
         <div class="nav-icons">
             <button class="nav-prev">
-                <img src="imgs/icons/arrow_left_line.svg" width="19">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512"><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m112 160l-64 64l64 64"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M64 224h294c58.76 0 106 49.33 106 108v20"/></svg>
             </button>
             <button class="nav-next">
-                <img src="imgs/icons/arrow_right_line.svg" width="19">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512"><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m400 160l64 64l-64 64"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M448 224H154c-58.76 0-106 49.33-106 108v20"/></svg>
             </button>
             <button class="nav-rel">
-                <img src="imgs/icons/refresh_1_line.svg" width="19">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512"><path fill="none" stroke="#000" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M320 146s24.36-12-64-12a160 160 0 1 0 160 160"/><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m256 58l80 80l-80 80"/></svg>
             </button>
         </div>
         <div class="input-container">
@@ -40,25 +40,6 @@
                 <input type="submit" hidden />
             </form>
             <div id="suggestion-box"></div>
-        </div>
-    </div>
-    <div class="home">
-        <div class="logo-container">
-            <div class="logo-img"></div>
-            <div class="logo-text"></div>
-        </div>
-        <div class="search-main">
-            <input type="text" class="search-home" id="search-home" placeholder="Search">
-        </div>
-        <div class="popular">
-            <p>Popular</p>
-            <div class="pop-list">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
         </div>
     </div>
     <div class="webview-container"></div>
