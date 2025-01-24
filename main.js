@@ -1,18 +1,16 @@
 const { app, BrowserWindow, Menu, ipcMain, globalShortcut} = require('electron');
 const path = require('path');
 const isDev = process.env.NODE_ENV !== 'production';
-const gotTheLock = app.requestSingleInstanceLock();
 let isLocked = false;
 let mainWindow;
 
 function createMainWindow () {
   mainWindow = new BrowserWindow({
     title: 'NEU Browser',
-    // resizable: false,
     maximizable: true,
     minimizable: false,
     moveable: true,
-    frame: true,
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -50,25 +48,6 @@ function createMainWindow () {
 }
 ipcMain.on('quit-app', () => {
   app.quit();
-});
-ipcMain.on('toggle-lock', (event) => {
-  console.log('Received toggle-lock event');
-  console.log('Current isLocked state:', isLocked);
-
-  isLocked = !isLocked;
-
-  try {
-    mainWindow.setResizable(!isLocked);
-    mainWindow.setMovable(!isLocked);
-    mainWindow.setMinimizable(!isLocked);
-    mainWindow.setClosable(!isLocked);
-    mainWindow.setFullScreenable(!isLocked);
-    console.log('Window properties successfully updated');
-  } catch (error) {
-    console.error('Failed to update window properties:', error);
-  }
-
-  console.log(`Window is now ${isLocked ? 'locked' : 'unlocked'}`);
 });
 
 app.whenReady().then(() => {

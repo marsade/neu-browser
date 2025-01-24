@@ -301,14 +301,6 @@ window.onload = () => {
   const forwardButton = document.querySelector('.nav-next');
   const reloadButton = document.querySelector('.nav-rel');
   document.getElementById('add-tab').addEventListener('click', createTab);
-  lockButton.addEventListener('click', () => {
-    lockButton.classList.toggle('unlocked');
-    if (lockButton.classList.contains('unlocked')) {
-      window.electronAPI.toggleLock(false);
-    } else {
-      window.electronAPI.toggleLock(true);
-    }
-  });
 
   searchInput.addEventListener('submit', (event) => {
     event.preventDefault();

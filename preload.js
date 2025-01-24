@@ -5,7 +5,6 @@ const path = require('path');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   quitApp: () => ipcRenderer.send('quit-app'),
-  toggleLock: (state) => ipcRenderer.send('toggle-lock', state),
   debounce,
   getHomePath: () => path.join(__dirname, '/renderer', 'home.html')
 });
