@@ -13,7 +13,7 @@
 }
 
 body {
-	font-family: 'Poppins', sans-serif;
+	font-family: 'Source Sans 3', serif;
 	overflow: hidden;
 	height: 100vh;
 	display: grid;
@@ -107,10 +107,12 @@ body {
 	}
 	.tab {
 		display: flex;
-		padding: 7px 10px;
+		padding: 7px 20px;
 		border-radius: 7px;
-		width: 180px;
+		width: 250px;
 		justify-content: space-between;
+		position: relative;
+		overflow-x: hidden;
 		cursor: default;
 		user-select: none;
 		white-space: nowrap;
@@ -124,6 +126,13 @@ body {
 		align-items: center;
 		white-space: nowrap;
 
+		p {
+			-webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  			mask-image: linear-gradient(to right, black 80%, transparent 100%);
+			width: 180px;
+			font-size: 1rem;
+		}
+
 	}
 	.tab-icon {
 		width: 12px;
@@ -132,12 +141,19 @@ body {
 		margin-right: 10px;
 	}
 	.close-tab {
-		width: 23px;
-		height: 25px;
+		height: 24px;
 		border: none;
 		border-radius: 4px;
 		background-color: transparent;
+		cursor: pointer;
+		position: absolute;
+		right: 10px;
+		top: 20%;
 
+		img {
+			width: 15px;
+			height: 15px;
+            }
 		&:hover {
 			background-color: rgba(67, 80, 88, 0.44);
 		}
@@ -152,18 +168,14 @@ body {
 	}
 	.add-tab {
 		margin-left: 10px;
-		width: 23px;
-		height: 25px;
 		border: none;
 		border-radius: 4px;
 		background-color: transparent;
-
+		padding: 3px;
+		height: 30px;
+		
 		&:hover {
 			background-color: rgba(67, 80, 88, 0.44);
-		}
-
-		img {
-			width: 15px;
 		}
 	}
 	
@@ -277,6 +289,9 @@ body {
 	background-position: center; 
 	background-repeat: no-repeat; 
 }
+#address-bar::placeholder {
+	font-family: 1rem;
+}
 .search-home {
 	width: 600px;
 	height: 50px;
@@ -317,4 +332,11 @@ webview {
 	width: 100%;
 	height: 100vh;
 	border: none;
+    z-index: -1;
+    position: absolute;
+    visibility: hidden;
+}
+webview.active {
+    z-index: 1;
+    visibility: visible;
 }
