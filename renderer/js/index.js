@@ -1,11 +1,18 @@
 const tabs = [];
 const addressBar = document.getElementById('address-bar');
 const suggestionBox = document.getElementById('suggestion-box');
+const popLinks = [
+  { url: 'https://uzebim.neu.edu.tr/', title: 'UZEBIM' },
+  { url: 'https://www.neu.edu.tr/', title: 'NEU Website' },
+  { url: 'https://www.instagram.com/', title: 'NEU Instagram' },
+  { url: 'http://library.neu.edu.tr/cgi-bin/koha/opac-main.pl', title: 'NEU Library' },
+  { url: 'https://permissions.gov.ct.tr/', title: 'Student Permission' },
+]
 let tabCount = 0;
 let currentWebView = null;
 let currentTabId = null;
 
-// Insert a new tab
+// Add a new tab
 function createTab () {
   tabCount++;
   console.log('tabCount:', tabCount);
@@ -16,33 +23,28 @@ function createTab () {
   homepageDiv.setAttribute('class', 'home')
   homepageDiv.setAttribute('id', `homepage-${tabId}`);
   homepageDiv.innerHTML = `
-    <div class="logo-container">
+  <div class="logo-container">
     <div class="logo-img"></div>
     <div class="logo-text"></div>
-    </div>
-    <div class="search-main">
-        <input type="text" class="search-home" id="search-home" placeholder="Search">
-    </div>
-    <div class="popular">
-        <p>Popular</p>
-        <div class="pop-list">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        </div>
-        `;
+  </div>
+  <div class="search-main">
+      <input type="text" class="search-home" id="search-home" placeholder="Search">
+  </div>
+  <div class="popular">
+      <p>Popular</p>
+      <div class="pop-list"></div>
+  </div>
+  `;
+
   const webviewContainer = document.querySelector('.webview-container')
   tabs.push({ id: tabId, history: [], content: homepageDiv });
   currentWebView = null;
   const parentDiv = webviewContainer.parentNode;
   parentDiv.insertBefore(homepageDiv, webviewContainer);
   addressBar.value = '';
-  const searchHome = document.getElementById('search-home');
   addressBar.focus();
   
+  const searchHome = document.getElementById('search-home');
   searchHome.addEventListener('input', (event) => {
     addressBar.focus();
     addressBar.click();
@@ -50,10 +52,48 @@ function createTab () {
     searchHome.value = '';
   });
   console.log('Called by createTab');
+  updateAllHomePages();
   updateDOM();
 }
 
-// Switch tabs
+function updateAllHomePages () {
+  const homePages = document.querySelectorAll('.home');
+  console.log(homePages);
+  homePages.forEach((homePage) => {
+    
+    let popList = homePage.querySelector('.pop-list');
+    if (!popList) {
+      popList = document.createElement('div');
+      popList.className = 'pop-list';
+      homePage.appendChild(popList);
+    }
+    popList.innerHTML = '';
+
+    popLinks.forEach((link) => {
+      const popItem = document.createElement('div');
+      const popImg = document.createElement('div');
+      popImg.style.backgroundImage = `url(${getFavicon(link.url)})`;
+      popItem.appendChild(popImg);
+
+      const label = document.createElement('span');
+      label.textContent = link.title;
+      label.className = 'pop-label';
+      popItem.appendChild(label);
+      popItem.className = 'pop-item';
+      popItem.title = link.title;
+  
+      popItem.addEventListener('click', () => {
+        createWebView(currentTabId, link.url);
+      });
+      popList.appendChild(popItem);
+    });
+  });
+}
+
+function getFavicon (url) {
+  return `https://www.google.com/s2/favicons?sz=128&domain=${url}`;
+}
+
 function updateAddressBar () {
   if (currentWebView && currentWebView !== null) {
     console.log('current webview:', currentWebView.src);
@@ -63,6 +103,7 @@ function updateAddressBar () {
   }
 }
 
+// Switch tabs
 function switchToTab (tabId) {
   if (currentTabId !== tabId) {
     currentTabId = tabId;
@@ -135,12 +176,12 @@ function createWebView(tabId, url) {
   if (homePageDiv) {
     homePageDiv.remove();
   }
-
+  
   webView.setAttribute('src', url);
   webView.setAttribute('data-tab-id', tabId);
   webView.classList.add('webview');
   webviewContainer.appendChild(webView);
-
+  
   const currentTab = tabs.find(tab => tab.id === tabId);
   if (currentTab) {
     currentTab.content = webView;
@@ -198,14 +239,14 @@ function updateDOM () {
     content = tab.content;
     tabDiv.innerHTML = `
     <div class="tab-left">
-      <div class="tab-icon"></div>
-      <p>${tab.title || 'New Tab'}</p>
+    <div class="tab-icon"></div>
+    <p>${tab.title || 'New Tab'}</p>
     </div>
     <button class="close-tab">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512"><path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144m224 0L144 368"/></svg>
     </button>
     `;
-
+    
     tabContainer.appendChild(tabDiv);
     tabDiv.addEventListener('mousedown', () => switchToTab(tab.id));
     tabDiv.querySelector('.close-tab').addEventListener('click', closeTab);
@@ -213,7 +254,7 @@ function updateDOM () {
       e.stopPropagation();
     });
     //   adjustTabWidths();
-
+    
     if (tab.id === currentTabId) {
       content.style.visibility = 'visible';
       content.style.zIndex = 1;
@@ -222,6 +263,7 @@ function updateDOM () {
       content.style.position = 'absolute';
       content.style.zIndex = -1;
     }
+
   });
 
   // Highlight the current tab
@@ -252,6 +294,7 @@ addressBar.addEventListener('input', (event) => {
   const query = event.target.value;
   fetchSuggestions(query);
 });
+
 addressBar.addEventListener('click', function () {
   this.classList.add('clicked');
   this.select();
@@ -280,23 +323,22 @@ function sendQuery (userInput) {
   const searchQuery = encodeURIComponent(userInput);
   const searchURL = `https://www.google.com/search?q=${searchQuery}`;
   addressBar.value = searchURL;
-
+  
   const currentTab = tabs.find(tab => tab.content === currentTabId);
   if (currentTab && currentTab.content instanceof HTMLElement && currentTab.content.tagName === 'WEBVIEW') {
-
+    
     currentWebView.setAttribute('src', searchURL);
   } else {
     createWebView(currentTabId, searchURL);
   }
 }
 
-
 // Load a tab on intitial window load
 window.onload = () => {
   createTab();
   const lockButton = document.querySelector('.lock');
   const searchInput = document.getElementById('search-input');
-
+  
   const backButton = document.querySelector('.nav-prev');
   const forwardButton = document.querySelector('.nav-next');
   const reloadButton = document.querySelector('.nav-rel');
@@ -310,7 +352,7 @@ window.onload = () => {
     suggestionBox.innerHTML = '';
     sendQuery(searchURL);
   });
-
+  
   backButton.addEventListener('click', () => {
     console.log(currentWebView.canGoBack());
   });
