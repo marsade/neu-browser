@@ -148,19 +148,20 @@ body {
 		input {
 			width: 500px;
 			height: 35px;
-			border: none;
+			border: 1px solid black;
 			border-radius: 5px;
 			background-color: #fff;
 			padding: 16px 0 16px 50px;
 			font-size: 1.1rem;
 			transition: width 0.3s ease;
+			color: #7c082bc1;
 			
 			&:focus {
 				outline: none;
 				border: none;
 				box-shadow: 4px 8px 8px 0px rgba(0,0,0,0.10);
 			}
-			&.clicked {
+			&.animated {
 				animation: expand 1s forwards;
 			}
 		}
@@ -200,6 +201,7 @@ body {
 .logo-container {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 }
 .logo-img {
 	width: 120px; 
@@ -241,11 +243,7 @@ body {
 		gap: 50px;
 		margin-top: 15px;
 		div {
-			width: 90px;
 			height: auto;
-			background-size: cover;
-			background-position: center;
-			background-repeat: no-repeat;
     			cursor: pointer;
 		}
 	}
@@ -257,6 +255,11 @@ body {
 		div {
 			width: 100px;
 			height: 100px;
+			border: 1px solid #c9c9c9;
+			border-radius: 5px;
+			background-size: 50px 50px;
+			background-position: center;
+			background-repeat: no-repeat;
 		}
 	}
 	.pop-img {
@@ -268,6 +271,7 @@ body {
 		cursor: pointer;
 		width: 100px;
 		text-align: center;
+		margin-top: 10px;
 	}
 }
 .webview-container {

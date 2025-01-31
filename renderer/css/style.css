@@ -143,19 +143,20 @@ body {
 .search-row .input-container input {
   width: 500px;
   height: 35px;
-  border: none;
+  border: 1px solid black;
   border-radius: 5px;
   background-color: #fff;
   padding: 16px 0 16px 50px;
   font-size: 1.1rem;
   transition: width 0.3s ease;
+  color: rgba(124, 8, 43, 0.7568627451);
 }
 .search-row .input-container input:focus {
   outline: none;
   border: none;
   box-shadow: 4px 8px 8px 0px rgba(0, 0, 0, 0.1);
 }
-.search-row .input-container input.clicked {
+.search-row .input-container input.animated {
   animation: expand 1s forwards;
 }
 .search-row .input-container #suggestion-box {
@@ -190,6 +191,7 @@ body {
 .logo-container {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .logo-img {
@@ -236,11 +238,7 @@ body {
   margin-top: 15px;
 }
 .popular .pop-list div {
-  width: 90px;
   height: auto;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   cursor: pointer;
 }
 .popular .pop-item {
@@ -251,6 +249,11 @@ body {
 .popular .pop-item div {
   width: 100px;
   height: 100px;
+  border: 1px solid #c9c9c9;
+  border-radius: 5px;
+  background-size: 50px 50px;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .popular .pop-img {
   border-radius: 8px;
@@ -261,6 +264,7 @@ body {
   cursor: pointer;
   width: 100px;
   text-align: center;
+  margin-top: 10px;
 }
 
 .webview-container {
