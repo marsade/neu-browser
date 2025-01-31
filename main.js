@@ -60,6 +60,9 @@ function registerShortcuts() {
       showNotification('Locks disabled', 'Browser locks disabled');
     }
   })
+  globalShortcut.register('Control+Shift+I', () => {
+    mainWindow.webContents.toggleDevTools();
+  });
 }
 
 function showNotification(title, body) {
